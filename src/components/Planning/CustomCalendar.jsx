@@ -2,24 +2,39 @@ import React from "react";
 import Calendar from "react-calendar";
 import styled from "styled-components";
 
-export const CustomCalendar = ({ setDepartDate, setReturnDate }) => {
+export const CustomCalendar = ({
+  setDepartDate,
+  setReturnDate,
+  departDate,
+  returnDate,
+}) => {
   return (
     <StyledCalendarWrapper>
       <div>
-        {/* 출발 날짜 선택 전용 */}
+        {/* 출발 날짜 선택 */}
         <StyledCalendar
           onChange={setDepartDate}
+          tileDisabled={({ date }) =>
+            (returnDate && date > returnDate) ||
+            date < new Date().setHours(0, 0, 0, 0)
+          }
           formatDay={(locale, date) => String(date.getDate())}
+          value={departDate}
           locale="ko-KR"
           calendarType="gregory"
         />
 
         <Line />
 
-        {/* 도착 날짜 선택 전용 */}
+        {/* 도착 날짜 선택 */}
         <StyledCalendar
           onChange={setReturnDate}
+          tileDisabled={({ date }) =>
+            (departDate && date < departDate) ||
+            date < new Date().setHours(0, 0, 0, 0)
+          }
           formatDay={(locale, date) => String(date.getDate())}
+          value={returnDate}
           locale="ko-KR"
           calendarType="gregory"
         />
@@ -39,7 +54,7 @@ const StyledCalendarWrapper = styled.div`
   > div {
     border-radius: 1rem;
     border: 1px solid #e0e6e8;
-    height: 350px; /* 원하는 고정 높이 (적절히 조절 가능) */
+    height: 450px; /* 원하는 고정 높이 (적절히 조절 가능) */
     overflow-y: auto;
   }
   .react-calendar {
@@ -92,7 +107,6 @@ const StyledCalendarWrapper = styled.div`
     height: 32px;
     text-align: center;
     padding-top: 0.8rem;
-    border-radius: 100%;
     font-weight: 500;
     font-size: 1rem;
   }

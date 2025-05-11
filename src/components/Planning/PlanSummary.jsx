@@ -34,7 +34,7 @@ export const PlanSummary = ({
             cities: cities,
             start_date: formatDate(departDate, "-"),
             end_date: formatDate(returnDate, "-"),
-            transportation: selectedTransportation,
+            transportation: [selectedTransportation],
             max_distance: distance,
             interests: selectedInterest,
             mood: selectedMood,

@@ -19,7 +19,7 @@ export const How = ({
             <TransportationBox
               key={mode}
               $isSelectedTransportation={selectedTransportation === mode}
-              onClick={() => setSelectedTransportation([mode])}
+              onClick={() => setSelectedTransportation(mode)}
             >
               {mode}
             </TransportationBox>

@@ -28,6 +28,8 @@ export const When = ({
       </DataWrapper>
 
       <CustomCalendar
+        departDate={departDate}
+        returnDate={returnDate}
         setDepartDate={setDepartDate}
         setReturnDate={setReturnDate}
       />
@@ -47,7 +49,7 @@ export const When = ({
 const WhenWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 2.5rem;
 `;
 
 const PlanningTitle = styled.h1`

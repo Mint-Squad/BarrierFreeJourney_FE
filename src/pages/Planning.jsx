@@ -1,5 +1,4 @@
 import { useState } from "react";
-
 import styled from "styled-components";
 import "react-calendar/dist/Calendar.css";
 import { When } from "../components/Planning/When";
@@ -7,6 +6,7 @@ import { Where } from "../components/Planning/Where";
 import { How } from "../components/Planning/How";
 import { Interest } from "../components/Planning/Interest";
 import { PlanSummary } from "../components/Planning/PlanSummary";
+import { StepProgress } from "../components/Planning/StepProgress";
 
 export const Planning = () => {
   const [step, setStep] = useState(1);
@@ -28,6 +28,7 @@ export const Planning = () => {
 
   return (
     <PlanningWrapper>
+      {step < 5 && <StepProgress currentStep={step} setStep={setStep} />}
       {step === 1 && (
         <When
           selecting={selecting}
