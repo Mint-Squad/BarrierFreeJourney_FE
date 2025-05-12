@@ -44,6 +44,7 @@ export const PlanSummary = ({
 
       const data = response.json();
       const travel_request_id = data.travel_request.id;
+      localStorage.setItem("request_id", travel_request_id);
       if (!response.ok) {
         throw new Error("Failed to create plan");
       }
@@ -99,7 +100,9 @@ export const PlanSummary = ({
       </SectionWrapper>
 
       <ButtonWrapper>
-        <NextButton $enabled={true}>다음</NextButton>
+        <NextButton $enabled={true} onClick={CreatePlan}>
+          다음
+        </NextButton>
       </ButtonWrapper>
     </PlanSummaryWrapper>
   );
@@ -121,7 +124,7 @@ const SectionWrapper = styled.div`
 const Title = styled.h1`
   font-size: 2rem;
   margin-bottom: 2rem;
-  font-weight: bold;
+  font-weight: 500;
   text-align: center;
 `;
 
