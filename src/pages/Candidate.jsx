@@ -2,8 +2,7 @@ import React, { useLayoutEffect, useState } from "react";
 import styled from "styled-components";
 import SearchIcon from "../assets/search.svg?react";
 import { mockCandidate } from "../mock/mockCandidate";
-import Checked from "../assets/checked.svg?react";
-import UnChecked from "../assets/unchecked.svg?react";
+import { WantToAddPlace } from "../components/Candidate/WantToAddPlace";
 
 // ✅ TODO
 // 1. 후보지 리스트 관심사에 따라서 필터링 구현하기 (이 필드가 필요할거같은데... 어떻게 하지??)
@@ -85,52 +84,14 @@ export const Candidate = () => {
         </Select>
       </SelectWrapper>
 
-      <WantToAddPlace>
-        <InputWrapper>
-          <input
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="추가하고 싶은 장소를 검색해보세요"
-          />
-          <SVGWrapper>
-            <StyledSearch />
-          </SVGWrapper>
-        </InputWrapper>
-
-        <PlaceList>
-          {candidates.map((candidate) => {
-            const isSelected = selectedCandidates.includes(candidate.place_id);
-
-            const toggleCandidate = () => {
-              if (isSelected) {
-                setSelectedCandidates((prev) =>
-                  prev.filter((id) => id !== candidate.place_id)
-                );
-              } else {
-                setSelectedCandidates((prev) => [...prev, candidate.place_id]);
-              }
-            };
-
-            return (
-              <PlaceItem key={candidate.place_id} onClick={toggleCandidate}>
-                <CheckWrapper>
-                  {isSelected ? <Checked /> : <UnChecked />}
-                </CheckWrapper>
-                <ImgWrapper>
-                  <img src={candidate.image_url || null} alt={candidate.name} />
-                </ImgWrapper>
-                <PlaceName>
-                  <p>{candidate.place_name}</p>
-                  <p>{candidate.address}</p>
-                  <p>평점 {candidate.rating}</p>
-                  {/* <p>{candidate.category}</p> */}
-                </PlaceName>
-              </PlaceItem>
-            );
-          })}
-        </PlaceList>
-      </WantToAddPlace>
+      <WantToAddPlace
+        inputValue={inputValue}
+        setInputValue={setInputValue}
+        handleKeyDown={handleKeyDown}
+        candidates={candidates}
+        selectedCandidates={selectedCandidates}
+        setSelectedCandidates={setSelectedCandidates}
+      />
 
       <ButtonWrapper>
         <NextButton>
@@ -187,86 +148,6 @@ const Text = styled.p`
   font-style: normal;
   font-weight: 600;
   line-height: 120%; /* 2.4rem */
-`;
-
-const WantToAddPlace = styled.div`
-  margin-top: 1.5rem;
-  margin-bottom: 9rem;
-`;
-
-const InputWrapper = styled.div`
-  position: relative;
-  margin: 1rem 0;
-  padding: 1.2rem;
-  background-color: #f5f7f9;
-  border-radius: 0.5rem;
-
-  > input {
-    width: 24rem;
-    background-color: transparent;
-    border: none;
-    color: #4e585f;
-    font-weight: 500;
-    font-size: 1.4rem;
-
-    &::placeholder {
-      color: #a0a7ad;
-    }
-  }
-`;
-
-const SVGWrapper = styled.div`
-  position: absolute;
-  right: 1.5rem;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-`;
-
-const StyledSearch = styled(SearchIcon)``;
-
-const PlaceList = styled.ul`
-  display: flex;
-  flex-direction: column;
-  gap: 1.6rem;
-`;
-
-const PlaceItem = styled.li`
-  display: flex;
-  align-items: center;
-`;
-
-const CheckWrapper = styled.div`
-  margin-right: 0.8rem;
-`;
-
-const ImgWrapper = styled.div`
-  width: 8rem;
-  height: 8rem;
-  aspect-ratio: 1/1;
-  border-radius: 0.2rem;
-  background: #d9d9d9;
-  margin-right: 1.6rem;
-`;
-
-const PlaceName = styled.div`
-  :first-child {
-    color: #000;
-    font-family: Pretendard;
-    font-size: 1.8rem;
-    font-style: normal;
-    font-weight: 600;
-    line-height: 120%; /* 2.16rem */
-  }
-
-  :not(:first-child) {
-    color: #4e585f;
-    font-family: Pretendard;
-    font-size: 1.2rem;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 120%; /* 1.44rem */
-  }
 `;
 
 const ButtonWrapper = styled.div`
