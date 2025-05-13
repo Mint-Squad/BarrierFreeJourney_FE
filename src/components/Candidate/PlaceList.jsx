@@ -32,10 +32,10 @@ export const PlaceList = ({
               <img src={candidate.image_url || null} alt={candidate.name} />
             </ImgWrapper>
             <PlaceName>
-              <p>{candidate.place_name}</p>
+              <p>{candidate.name}</p>
               <p>{candidate.address}</p>
               <p>평점 {candidate.rating}</p>
-              {/* <p>{candidate.category}</p> */}
+              <p>#{candidate.searched_mood}</p>
             </PlaceName>
           </PlaceItem>
         );
