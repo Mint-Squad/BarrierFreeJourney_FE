@@ -36,11 +36,13 @@ export const Candidate = () => {
     const getRecomendedCandidate = async () => {
       setIsLoading(true);
       try {
+        const interest =
+          selectedInterest !== "전체" ? `?interest=${selectedInterest}` : "";
         const request_id = localStorage.getItem("request_id");
         const response = await fetch(
           `${
             import.meta.env.VITE_API_URL
-          }/travel/schedule/candidates/${request_id}/`,
+          }/travel/schedule/candidates/${request_id}/${interest}`,
           {
             method: "GET",
             headers: {
@@ -62,8 +64,35 @@ export const Candidate = () => {
       }
     };
 
+    // ✅ 여기서 아래 주석 해제하기
     // getRecomendedCandidate();
-  }, []);
+  }, [selectedInterest]);
+
+  const onClickNextButton = async () => {
+    try {
+      const request_id = localStorage.getItem("request_id");
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/travel/schedule/select/${request_id}/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            selected_place_ids: selectedCandidates,
+          }),
+        }
+      );
+
+      const data = await response.json();
+      console.log(data);
+      if (!response.ok) {
+        throw new Error("Failed to save selected candidates");
+      }
+    } catch (error) {
+      console.error("Error saving selected candidates:", error);
+    }
+  };
 
   return (
     <CandidateWrapper>
@@ -94,7 +123,7 @@ export const Candidate = () => {
       />
 
       <ButtonWrapper>
-        <NextButton>
+        <NextButton onClick={onClickNextButton}>
           총 <span>{selectedCandidates.length}</span> 개 선택 완료
         </NextButton>
       </ButtonWrapper>
@@ -105,6 +134,7 @@ export const Candidate = () => {
 const CandidateWrapper = styled.div`
   display: flex;
   flex-direction: column;
+  padding: 2rem;
 `;
 
 const Title = styled.h1`

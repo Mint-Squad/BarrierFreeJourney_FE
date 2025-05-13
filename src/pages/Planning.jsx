@@ -100,4 +100,5 @@ const PlanningWrapper = styled.div`
 
   flex-direction: column;
   gap: 3rem;
+  padding: 2rem;
 `;

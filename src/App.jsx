@@ -13,6 +13,4 @@ function App() {
 
 export default App;
 
-const ApContainer = styled.div`
-  padding: 2rem;
-`;
+const ApContainer = styled.div``;
