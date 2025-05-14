@@ -8,6 +8,7 @@ import {
 } from "@dnd-kit/sortable";
 import styled from "styled-components";
 import { CSS } from "@dnd-kit/utilities";
+import DragHandleIcon from "../../assets/drag_handle_icon.svg?react";
 
 export const SortableCityItem = ({ city, index, onRemove }) => {
   const {
@@ -25,26 +26,6 @@ export const SortableCityItem = ({ city, index, onRemove }) => {
     opacity: isDragging ? 0.5 : 1,
     zIndex: isDragging ? 1 : 0,
   };
-
-  const DragHandleIcon = () => (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <circle cx="4" cy="4" r="1.5" fill="#4E585F" />
-      <circle cx="4" cy="8" r="1.5" fill="#4E585F" />
-      <circle cx="4" cy="12" r="1.5" fill="#4E585F" />
-      <circle cx="8" cy="4" r="1.5" fill="#4E585F" />
-      <circle cx="8" cy="8" r="1.5" fill="#4E585F" />
-      <circle cx="8" cy="12" r="1.5" fill="#4E585F" />
-      <circle cx="12" cy="4" r="1.5" fill="#4E585F" />
-      <circle cx="12" cy="8" r="1.5" fill="#4E585F" />
-      <circle cx="12" cy="12" r="1.5" fill="#4E585F" />
-    </svg>
-  );
 
   return (
     <CityItem ref={setNodeRef} style={style}>

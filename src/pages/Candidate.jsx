@@ -3,6 +3,7 @@ import styled from "styled-components";
 import SearchIcon from "../assets/search.svg?react";
 import { mockCandidate } from "../mock/mockCandidate";
 import { WantToAddPlace } from "../components/Candidate/WantToAddPlace";
+import { useNavigate } from "react-router-dom";
 
 // ✅ TODO
 // 1. 후보지 리스트 관심사에 따라서 필터링 구현하기 (이 필드가 필요할거같은데... 어떻게 하지??)
@@ -25,6 +26,8 @@ export const Candidate = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [candidates, setCandidates] = useState(mockCandidate.candidates);
   const [selectedCandidates, setSelectedCandidates] = useState([]);
+
+  const navigate = useNavigate();
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -89,6 +92,27 @@ export const Candidate = () => {
       if (!response.ok) {
         throw new Error("Failed to save selected candidates");
       }
+
+      const response2 = await fetch(
+        `${import.meta.env.VITE_API_URL}/travel/schedule/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            travel_request_id: request_id,
+          }),
+        }
+      );
+
+      const data2 = await response.json();
+      console.log(data2);
+      if (!response2.ok) {
+        throw new Error("Failed to save selected candidates");
+      }
+
+      navigate("/geminiedplan");
     } catch (error) {
       console.error("Error saving selected candidates:", error);
     }
