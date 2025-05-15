@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { getNightsDays } from "../../utils/getNightDays";
 import { formatDate } from "../../utils/formatDate";
+import { useNavigate } from "react-router-dom";
 
 export const PlanSummary = ({
   selectedCountry,
@@ -16,40 +17,41 @@ export const PlanSummary = ({
   setStep,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const CreatePlan = async () => {
     setIsLoading(true);
     try {
-      // API call to create plan
-      // await createPlanAPI();
+      const dataToSend = {
+        country: selectedForeign,
+        cities: cities,
+        start_date: formatDate(departDate, "-"),
+        end_date: formatDate(returnDate, "-"),
+        transportation: [selectedTransportation],
+        max_distance: distance,
+        interests: selectedInterest,
+        mood: selectedMood,
+      };
+      console.log(dataToSend);
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/travel/request/`,
+        `${import.meta.env.VITE_API_URL}/travel/request`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            country: selectedForeign,
-            cities: cities,
-            start_date: formatDate(departDate, "-"),
-            end_date: formatDate(returnDate, "-"),
-            transportation: [selectedTransportation],
-            max_distance: distance,
-            interests: selectedInterest,
-            mood: selectedMood,
-          }),
+          body: JSON.stringify(dataToSend),
         }
       );
 
-      const data = response.json();
+      const data = await response.json();
       const travel_request_id = data.travel_request.id;
       localStorage.setItem("request_id", travel_request_id);
       if (!response.ok) {
         throw new Error("Failed to create plan");
       }
 
-      console.log(data);
+      navigate("/candidate");
     } catch (error) {
       console.error("Error creating plan:", error);
     } finally {

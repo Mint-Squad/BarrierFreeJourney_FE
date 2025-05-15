@@ -1,9 +1,12 @@
-import React, { useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import styled from "styled-components";
 import SearchIcon from "../assets/search.svg?react";
 import { mockCandidate } from "../mock/mockCandidate";
 import { WantToAddPlace } from "../components/Candidate/WantToAddPlace";
 import { useNavigate } from "react-router-dom";
+import loading from "../assets/loading.json";
+import Lottie from "lottie-react";
+import Hangul from "hangul-js";
 
 // ✅ TODO
 // 1. 후보지 리스트 관심사에 따라서 필터링 구현하기 (이 필드가 필요할거같은데... 어떻게 하지??)
@@ -24,8 +27,9 @@ export const Candidate = () => {
   const [selectedInterest, setSelectedInterest] = useState("전체");
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [candidates, setCandidates] = useState(mockCandidate.candidates);
+  const [candidates, setCandidates] = useState([]);
   const [selectedCandidates, setSelectedCandidates] = useState([]);
+  const [toShow, setToShow] = useState([]);
 
   const navigate = useNavigate();
 
@@ -35,17 +39,19 @@ export const Candidate = () => {
     }
   };
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const getRecomendedCandidate = async () => {
       setIsLoading(true);
       try {
         const interest =
-          selectedInterest !== "전체" ? `?interest=${selectedInterest}` : "";
+          selectedInterest !== "전체"
+            ? `/?interest=${encodeURIComponent(selectedInterest)}`
+            : "";
         const request_id = localStorage.getItem("request_id");
         const response = await fetch(
           `${
             import.meta.env.VITE_API_URL
-          }/travel/schedule/candidates/${request_id}/${interest}`,
+          }/travel/schedule/candidates/${request_id}${interest}`,
           {
             method: "GET",
             headers: {
@@ -56,6 +62,7 @@ export const Candidate = () => {
 
         const data = await response.json();
         setCandidates(data.candidates);
+        setToShow(data.candidates);
 
         if (!response.ok) {
           throw new Error("Failed to fetch recommended candidates");
@@ -68,14 +75,29 @@ export const Candidate = () => {
     };
 
     // ✅ 여기서 아래 주석 해제하기
-    // getRecomendedCandidate();
+    getRecomendedCandidate();
   }, [selectedInterest]);
+
+  useEffect(() => {
+    if (inputValue !== "") {
+      console.log(inputValue);
+      const filtered = candidates.filter(
+        (candidate) => Hangul.search(candidate.name, inputValue) >= 0
+      );
+
+      console.log(filtered);
+
+      setCandidates(filtered);
+    } else {
+      setCandidates(toShow);
+    }
+  }, [inputValue]);
 
   const onClickNextButton = async () => {
     try {
       const request_id = localStorage.getItem("request_id");
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/travel/schedule/select/${request_id}/`,
+        `${import.meta.env.VITE_API_URL}/travel/schedule/select/${request_id}`,
         {
           method: "POST",
           headers: {
@@ -146,6 +168,12 @@ export const Candidate = () => {
         setSelectedCandidates={setSelectedCandidates}
       />
 
+      {isLoading && (
+        <LottieContainer>
+          <Lottie animationData={loading}></Lottie>
+        </LottieContainer>
+      )}
+
       <ButtonWrapper>
         <NextButton onClick={onClickNextButton}>
           총 <span>{selectedCandidates.length}</span> 개 선택 완료
@@ -159,6 +187,12 @@ const CandidateWrapper = styled.div`
   display: flex;
   flex-direction: column;
   padding: 2rem;
+`;
+
+const LottieContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const Title = styled.h1`

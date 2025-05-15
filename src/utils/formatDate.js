@@ -5,7 +5,7 @@ export const formatDate = (date, type = "-") => {
   const month = String(date.getMonth() + 1).padStart(2, "0"); // MM
   const day = String(date.getDate()).padStart(2, "0"); // DD
   if (type === "-") {
-    return `${year}-${month}-${day}`;
+    return `20${year}-${month}-${day}`;
   }
-  return `${year}/${month}/${day}`;
+  return `20${year}/${month}/${day}`;
 };

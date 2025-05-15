@@ -354,7 +354,7 @@ const DetailList = styled.ul`
   margin-bottom: 15.5rem;
 `;
 
-const PlaceItem = styled.li``;
+const PlaceItem = styled.div``;
 
 const Upper = styled.div`
   display: flex;
