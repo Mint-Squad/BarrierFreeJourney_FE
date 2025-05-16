@@ -11,9 +11,7 @@ import { useNavigate } from "react-router-dom";
 export const GeminiedPlan = () => {
   const [day, setDay] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
-  const [planData, setPlanData] = useState(
-    getSortedScheduleByLatestVersion(mockGeminied)
-  );
+  const [planData, setPlanData] = useState([]);
   const navigate = useNavigate();
 
   const getGeminiedPlan = async () => {
@@ -42,7 +40,7 @@ export const GeminiedPlan = () => {
 
   useEffect(() => {
     // ✅ 아래 주석 지우고 함수 부르기
-    // getGeminiedPlan();
+    getGeminiedPlan();
   }, []);
 
   const handlePrev = () => {
@@ -62,11 +60,11 @@ export const GeminiedPlan = () => {
     try {
       const request_id = localStorage.getItem("request_id");
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/travel/schedule/`,
+        `${import.meta.env.VITE_API_URL}/travel/schedule`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ travel_request_id: request_id }),
+          body: JSON.stringify({ travel_request: Number(request_id) }),
         }
       );
 
@@ -79,11 +77,13 @@ export const GeminiedPlan = () => {
       }
 
       // ✅ 아래 주석 지우고 함수 부르기
-      // await getGeminiedPlan();
+      await getGeminiedPlan();
     } catch (error) {
-      console.error("Error");
+      console.error("Error", error);
     }
   };
+
+  if (isLoading) return <div></div>;
 
   return (
     <GeminiedPlanWrapper>

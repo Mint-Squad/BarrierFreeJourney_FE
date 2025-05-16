@@ -46,6 +46,7 @@ export const PlanSummary = ({
 
       const data = await response.json();
       const travel_request_id = data.travel_request.id;
+      console.log(travel_request_id);
       localStorage.setItem("request_id", travel_request_id);
       if (!response.ok) {
         throw new Error("Failed to create plan");

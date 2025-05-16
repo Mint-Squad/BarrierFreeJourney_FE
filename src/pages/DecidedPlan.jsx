@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { formatTimeDifference } from "../utils/formatTimeDifference";
 import { getSortedScheduleByLatestVersion } from "../utils/groupAndSortScheduleItemsByDate";
-import { mockGeminied } from "../mock/mockGeminied";
+
 import styled from "styled-components";
 import PrevArrow from "../assets/prev_arrow.svg?react";
 import NextArrow from "../assets/next_arrow.svg?react";
@@ -26,10 +26,9 @@ import DragHandleIcon from "../assets/drag_handle_icon.svg?react";
 export const DecidedPlan = () => {
   const [day, setDay] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
-  const [planData, setPlanData] = useState(
-    getSortedScheduleByLatestVersion(mockGeminied)
-  );
+  const [planData, setPlanData] = useState([]);
   const [activeItem, setActiveItem] = useState(null);
+  const [isGet, setIsGet] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -43,18 +42,58 @@ export const DecidedPlan = () => {
     })
   );
 
-  // Generate unique IDs for each item if they don't already have one
-  useEffect(() => {
-    const updatedPlanData = planData.map((dayPlan) => ({
+  function injectPlaceIdAndClean(planData) {
+    return planData.map((dayPlan) => ({
       ...dayPlan,
-      items: dayPlan.items.map((item, index) => ({
-        ...item,
-        id: item.id || `item-${dayPlan.day}-${index}`,
-      })),
+      items: dayPlan.items.map((item) => {
+        const newItem = {
+          ...item,
+          place_id: item.place?.place_id || null,
+        };
+        delete newItem.place;
+        delete newItem.id;
+        return newItem;
+      }),
     }));
+  }
 
-    setPlanData(updatedPlanData);
-  }, []);
+  const patchPlanData = async () => {
+    try {
+      const request_id = localStorage.getItem("request_id");
+      const version_id = localStorage.getItem("version_id");
+      const planWithPlaceId = injectPlaceIdAndClean(planData).flatMap(
+        (plan) => plan.items
+      );
+
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_API_URL
+        }/travel/schedule/${request_id}/${version_id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            items: planWithPlaceId,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error("Error");
+      }
+
+      console.log("[patchPlanData] response:", data);
+
+      // ✅ 아래는 주석 처리하거나 완전히 삭제
+      // setPlanData(data); ❌ 구조가 맞지 않음
+    } catch (error) {
+      console.error("Error", error);
+    }
+  };
 
   // DnD event handlers
   const handleDragStart = (event) => {
@@ -79,15 +118,23 @@ export const DecidedPlan = () => {
           (item) => item.id === over.id
         );
 
+        // ✅ 시작/종료 시간 스왑
+        const tempStart = currentDayItems[oldIndex].start_time;
+        const tempEnd = currentDayItems[oldIndex].end_time;
+        currentDayItems[oldIndex].start_time =
+          currentDayItems[newIndex].start_time;
+        currentDayItems[oldIndex].end_time = currentDayItems[newIndex].end_time;
+        currentDayItems[newIndex].start_time = tempStart;
+        currentDayItems[newIndex].end_time = tempEnd;
+
+        // ✅ 순서 바꾸기
         updatedPlanData[day - 1].items = arrayMove(
           currentDayItems,
           oldIndex,
           newIndex
         );
 
-        // Here you would make an API call to update the order on the server
-        // updateItemOrderOnServer(updatedPlanData[day - 1].items);
-        console.log(updatedPlanData);
+        patchPlanData(); // 파라미터는 내부에서 재계산하고 있으니 안 넘겨도 됨
         return updatedPlanData;
       });
     }
@@ -110,7 +157,13 @@ export const DecidedPlan = () => {
       );
 
       const data = await response.json();
+      console.log(data);
+      localStorage.setItem(
+        "version_id",
+        data.schedules[data.schedules.length - 1].version
+      );
       const sortedPlan = getSortedScheduleByLatestVersion(data);
+      console.log(sortedPlan);
       setPlanData(sortedPlan);
       setDay(1);
       setIsLoading(false);
@@ -121,47 +174,23 @@ export const DecidedPlan = () => {
 
   useEffect(() => {
     // ✅ Uncomment the following line to fetch real data
-    // getGeminiedPlan();
+    getGeminiedPlan();
     setIsLoading(false); // For testing with mock data
+    setIsGet(true);
   }, []);
 
+  // Generate unique IDs for each item if they don't already have one
   useEffect(() => {
-    const patchPlanData = async () => {
-      try {
-        const request_id = localStorage.getItem("request_id");
-        const version_id = localStorage.getItem("version_id");
-        const response = await fetch(
-          `${
-            import.meta.env.VITE_API_URL
-          }/travel/schedule/${request_id}/${version_id}`,
-          {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              items: planData.items,
-            }),
-          }
-        );
+    const updatedPlanData = planData.map((dayPlan) => ({
+      ...dayPlan,
+      items: dayPlan.items.map((item, index) => ({
+        ...item,
+        id: item.id || `item-${dayPlan.day}-${index}`,
+      })),
+    }));
 
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error("Error");
-        }
-
-        console.log(data);
-        setPlanData(data);
-      } catch (error) {
-        console.error("Error");
-      }
-    };
-
-    // ✅ dnd 일어날때마다 새롭게 fetch 해서 이동 시간 보여주는 로직
-    // 아래 주석 제거하기
-    // patchPlanData();
-  }, [planData]);
+    setPlanData(updatedPlanData);
+  }, []);
 
   const handlePrev = () => {
     if (day > 1) {

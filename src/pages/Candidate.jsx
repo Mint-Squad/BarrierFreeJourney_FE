@@ -80,18 +80,19 @@ export const Candidate = () => {
 
   useEffect(() => {
     if (inputValue !== "") {
-      console.log(inputValue);
       const filtered = candidates.filter(
         (candidate) => Hangul.search(candidate.name, inputValue) >= 0
       );
-
-      console.log(filtered);
 
       setCandidates(filtered);
     } else {
       setCandidates(toShow);
     }
   }, [inputValue]);
+
+  useEffect(() => {
+    setIsLoading(true);
+  }, [selectedInterest]);
 
   const onClickNextButton = async () => {
     try {
@@ -115,26 +116,30 @@ export const Candidate = () => {
         throw new Error("Failed to save selected candidates");
       }
 
-      const response2 = await fetch(
-        `${import.meta.env.VITE_API_URL}/travel/schedule/`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            travel_request_id: request_id,
-          }),
+      try {
+        const response2 = await fetch(
+          `${import.meta.env.VITE_API_URL}/travel/schedule`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              travel_request: Number(request_id),
+            }),
+          }
+        );
+
+        const data2 = await response2.json();
+        console.log(data2);
+        if (!response2.ok) {
+          throw new Error("Failed to save selected candidates");
         }
-      );
 
-      const data2 = await response.json();
-      console.log(data2);
-      if (!response2.ok) {
-        throw new Error("Failed to save selected candidates");
+        navigate("/geminiedplan");
+      } catch (error) {
+        console.error("Error", error);
       }
-
-      navigate("/geminiedplan");
     } catch (error) {
       console.error("Error saving selected candidates:", error);
     }
