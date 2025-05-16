@@ -40,13 +40,11 @@ export const How = ({
             value={distance}
             onChange={(e) => setDistance(e.target.value)}
           >
-            <option value={0.2}>0.2</option>
-            <option value={0.5}>0.5</option>
             <option value={1}>1</option>
-            <option value={1.5}>1.5</option>
             <option value={2}>2</option>
-            <option value={2.5}>2.5</option>
             <option value={3}>3</option>
+            <option value={4}>4</option>
+            <option value={5}>5</option>
           </StyledSelect>
           <LabelText>KM 이내</LabelText>
         </DistanceWrapper>
@@ -57,7 +55,7 @@ export const How = ({
           이전
         </PrevButton>
         <NextButton
-          $enabled={selectedTransportation !== ""}
+          $enabled={selectedTransportation.length != 0}
           onClick={() => setStep((prevStep) => prevStep + 1)}
         >
           다음

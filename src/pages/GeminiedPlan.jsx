@@ -7,6 +7,7 @@ import { mockGeminied } from "../mock/mockGeminied";
 import { formatTimeDifference } from "../utils/formatTimeDifference";
 import { getSortedScheduleByLatestVersion } from "../utils/groupAndSortScheduleItemsByDate";
 import { useNavigate } from "react-router-dom";
+import Loading from "../common/Loading";
 
 export const GeminiedPlan = () => {
   const [day, setDay] = useState(1);
@@ -57,6 +58,7 @@ export const GeminiedPlan = () => {
   };
 
   const onClickRetry = async () => {
+    setIsLoading(true);
     try {
       const request_id = localStorage.getItem("request_id");
       const response = await fetch(
@@ -80,10 +82,12 @@ export const GeminiedPlan = () => {
       await getGeminiedPlan();
     } catch (error) {
       console.error("Error", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  if (isLoading) return <div></div>;
+  if (isLoading) return <Loading />;
 
   return (
     <GeminiedPlanWrapper>

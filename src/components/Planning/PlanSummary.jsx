@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { getNightsDays } from "../../utils/getNightDays";
 import { formatDate } from "../../utils/formatDate";
 import { useNavigate } from "react-router-dom";
+import Loading from "../../common/Loading";
 
 export const PlanSummary = ({
   selectedCountry,
@@ -59,6 +60,8 @@ export const PlanSummary = ({
       setIsLoading(false);
     }
   };
+
+  if (isLoading) return <Loading />;
   return (
     <PlanSummaryWrapper>
       <Title>여행 플랜생성</Title>

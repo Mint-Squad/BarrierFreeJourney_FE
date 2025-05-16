@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import loading from "../assets/loading.json";
 import Lottie from "lottie-react";
 import Hangul from "hangul-js";
+import Loading from "../common/Loading";
 
 // ✅ TODO
 // 1. 후보지 리스트 관심사에 따라서 필터링 구현하기 (이 필드가 필요할거같은데... 어떻게 하지??)
@@ -95,6 +96,7 @@ export const Candidate = () => {
   }, [selectedInterest]);
 
   const onClickNextButton = async () => {
+    setIsLoading(true);
     try {
       const request_id = localStorage.getItem("request_id");
       const response = await fetch(
@@ -142,8 +144,12 @@ export const Candidate = () => {
       }
     } catch (error) {
       console.error("Error saving selected candidates:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  if (isLoading) return <Loading />;
 
   return (
     <CandidateWrapper>

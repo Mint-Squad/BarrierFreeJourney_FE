@@ -22,6 +22,7 @@ import {
 } from "@dnd-kit/sortable";
 import { SortablePlaceItem } from "../components/DecidedPlan/SortablePlaceItem";
 import DragHandleIcon from "../assets/drag_handle_icon.svg?react";
+import Loading from "../common/Loading";
 
 export const DecidedPlan = () => {
   const [day, setDay] = useState(1);
@@ -228,7 +229,7 @@ export const DecidedPlan = () => {
       </Day>
 
       {isLoading ? (
-        <Loading>로딩 중...</Loading>
+        <Loading />
       ) : (
         <DndContext
           sensors={sensors}
@@ -483,11 +484,3 @@ const Address = styled.div`
 `;
 
 const Right = styled.div``;
-
-const Loading = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
-  font-size: 1.6rem;
-`;

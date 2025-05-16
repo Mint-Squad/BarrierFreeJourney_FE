@@ -21,7 +21,7 @@ export const Planning = () => {
   const [cities, setCities] = useState([]);
 
   const [selectedTransportation, setSelectedTransportation] = useState([]);
-  const [distance, setDistance] = useState(0.2);
+  const [distance, setDistance] = useState(1);
 
   const [selectedInterest, setSelectedInterest] = useState([]);
   const [selectedMood, setSelectedMood] = useState([]);
