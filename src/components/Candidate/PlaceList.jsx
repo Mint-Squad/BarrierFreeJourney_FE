@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import Checked from "../../assets/checked.svg?react";
-import UnChecked from "../../assets/unchecked.svg?react";
+import UnChecked from "../../assets/unChecked.svg?react";
 
 export const PlaceList = ({
   candidates,
